@@ -32,5 +32,6 @@ with right:
 
 st.info(
     "The current form estimate is experimental and uncalibrated. Live sportsbook "
-    "odds are not connected, and factors such as injuries are not included yet."
+    "moneylines are available when an Odds API key is configured; otherwise, you "
+    "can enter a price manually. Factors such as injuries are not included yet."
 )

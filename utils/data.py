@@ -1,15 +1,12 @@
 """NBA recent-form data with a cached API request and a sample-data fallback."""
 
-from datetime import datetime, timedelta, timezone
 import math
-import json
+from datetime import datetime, timedelta, timezone
 from typing import Any
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 import pandas as pd
+import requests
 import streamlit as st
 from nba_api.stats.endpoints import leaguegamelog, scheduleleaguev2
 
@@ -100,32 +97,34 @@ def get_nba_moneyline_odds(
     if not api_key.strip():
         return [], None, "Add ODDS_API_KEY to .streamlit/secrets.toml to load odds."
 
-    query = urlencode(
-        {
-            "apiKey": api_key.strip(),
-            "regions": "us",
-            "markets": "h2h",
-            "oddsFormat": "american",
-        }
-    )
-    request = Request(
-        f"https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?{query}",
-        headers={"User-Agent": "LineCheck/1.0"},
-    )
     try:
-        with urlopen(request, timeout=20) as response:
-            events = json.loads(response.read().decode("utf-8"))
-            remaining = response.headers.get("x-requests-remaining")
-    except HTTPError as exc:
-        if exc.code in (401, 403):
-            return [], None, "The Odds API rejected the key. Check ODDS_API_KEY."
-        if exc.code == 429:
-            return [], None, "The Odds API request limit has been reached."
-        return [], None, f"The Odds API returned HTTP {exc.code}."
-    except (TimeoutError, URLError, OSError):
+        response = requests.get(
+            "https://api.the-odds-api.com/v4/sports/basketball_nba/odds/",
+            params={
+                "apiKey": api_key.strip(),
+                "regions": "us",
+                "markets": "h2h",
+                "oddsFormat": "american",
+            },
+            headers={"User-Agent": "LineCheck/1.0"},
+            timeout=20,
+        )
+    except requests.Timeout:
+        return [], None, "The Odds API request timed out. Try again later."
+    except requests.RequestException:
         return [], None, "The Odds API could not be reached. Try again later."
-    except (UnicodeDecodeError, json.JSONDecodeError):
+
+    if response.status_code in (401, 403):
+        return [], None, "The Odds API rejected the key. Check ODDS_API_KEY."
+    if response.status_code == 429:
+        return [], None, "The Odds API request limit has been reached."
+    if response.status_code >= 400:
+        return [], None, f"The Odds API returned HTTP {response.status_code}."
+    try:
+        events = response.json()
+    except ValueError:
         return [], None, "The Odds API returned an unreadable response."
+    remaining = response.headers.get("x-requests-remaining")
 
     if not isinstance(events, list):
         return [], None, "The Odds API response was not a list of games."
