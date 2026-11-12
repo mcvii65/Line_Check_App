@@ -2,6 +2,8 @@
 
 import streamlit as st
 
+from utils.teams import TEAM_COLORS
+
 LOGO = """
 <svg viewBox="0 0 64 64" role="img" aria-label="Line Check basketball logo">
   <circle cx="32" cy="32" r="27" fill="#e87524" stroke="#f6bd60" stroke-width="2"/>
@@ -45,6 +47,24 @@ def apply_global_styles() -> None:
                      font-size:.78rem; font-weight:700; }
         .lc-card { border:1px solid rgba(246,189,96,.22); border-radius:14px;
                    padding:1.15rem 1.3rem; background:rgba(255,255,255,.035); }
+        .lc-matchup { border:1px solid rgba(255,255,255,.1); border-radius:16px;
+                      padding:1rem 1.1rem; margin:.2rem 0 .45rem;
+                      background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.02)); }
+        .lc-matchup-top { color:#bdb5aa; font-size:.78rem; display:flex;
+                          justify-content:space-between; margin-bottom:.8rem; }
+        .lc-matchup-teams { display:flex; align-items:center; justify-content:space-between; gap:.4rem; }
+        .lc-team { display:flex; align-items:center; gap:.55rem; min-width:0; }
+        .lc-team-right { flex-direction:row-reverse; text-align:right; }
+        .lc-team-badge { width:42px; height:42px; border-radius:50%; display:flex;
+                         align-items:center; justify-content:center; font-weight:800;
+                         font-size:.78rem; letter-spacing:.02em; flex:none;
+                         box-shadow:0 0 0 2px rgba(255,255,255,.12); }
+        .lc-team-name { font-weight:700; color:#fff4df; font-size:.9rem; line-height:1.2; }
+        .lc-vs { color:#9d9488; font:600 1rem 'Oswald',sans-serif; }
+        .lc-market { font-size:.76rem; color:#f6bd60; text-transform:uppercase;
+                     letter-spacing:.1em; margin-top:.8rem; }
+        .lc-model-note { border-left:3px solid #f6bd60; padding:.7rem 1rem;
+                         background:rgba(246,189,96,.07); border-radius:0 8px 8px 0; }
         .lc-disclaimer { color:#c8c0b5; font-size:.78rem; line-height:1.45; }
         div.stButton > button[kind="primary"] {
             background:#e87524; border-color:#e87524; color:#151515; font-weight:700;
@@ -89,7 +109,36 @@ def render_sidebar() -> None:
 
 def render_page_footer() -> None:
     """Display the shared educational disclaimer on the active page."""
-    st.divider()
+    st.divider(    )
+
+
+def matchup_card_html(game: dict[str, str]) -> str:
+    """Build a matchup card with team-color monogram badges."""
+    away_main, away_accent = TEAM_COLORS[game["away_abbreviation"]]
+    home_main, home_accent = TEAM_COLORS[game["home_abbreviation"]]
+    return f"""
+    <div class="lc-matchup">
+      <div class="lc-matchup-top">
+        <span>{game["date"]}</span><span>{game["time"]}</span>
+      </div>
+      <div class="lc-matchup-teams">
+        <div class="lc-team">
+          <span class="lc-team-badge" style="background:{away_main};border:2px solid {away_accent};color:#fff">
+            {game["away_abbreviation"]}
+          </span>
+          <span class="lc-team-name">{game["away_team"]}</span>
+        </div>
+        <span class="lc-vs">@</span>
+        <div class="lc-team lc-team-right">
+          <span class="lc-team-badge" style="background:{home_main};border:2px solid {home_accent};color:#fff">
+            {game["home_abbreviation"]}
+          </span>
+          <span class="lc-team-name">{game["home_team"]}</span>
+        </div>
+      </div>
+      <div class="lc-market">Moneyline · choose a matchup to analyze</div>
+    </div>
+    """
     st.caption(
         "Line Check is for education and analysis only. It does not guarantee "
         "outcomes. Please bet responsibly, only where legal, and only if you are "

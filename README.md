@@ -4,11 +4,11 @@
 Michael Vaccaro II
 
 ## App Description
-Line Check is an NBA analytics and decision-support app. It helps users compare
-a sportsbook's American odds with their own research-based estimate of a game's
-outcome, explore recent team form, and track their bets. Line Check does not
-generate picks or guarantee results; its calculations depend on the assumptions
-and estimates entered by the user.
+Line Check is an NBA analytics and decision-support app. It puts upcoming
+matchups, a sportsbook's moneyline, and recent-game context together so users
+can examine how a market price compares with a transparent, early form estimate.
+Line Check does not generate guaranteed picks; its current estimate is an
+experimental heuristic, not a calibrated prediction model.
 
 ## Intended Users
 NBA fans and casual-to-serious bettors looking for data-driven reasoning, along
@@ -16,14 +16,19 @@ with students and analysts interested in sports analytics.
 
 ## Current Features
 - Home/About page explaining the app and how to use it.
-- Edge Finder converts American odds to raw implied probability, compares that
-  probability with a user's estimate, calculates expected value, and displays
-  full- and half-Kelly reference stakes.
+- Edge Finder lists NBA games scheduled in the next 48 hours, lets users select
+  a matchup and view The Odds API's US sportsbook moneylines when configured.
+  Without an API key or listed price, users can enter odds manually. It compares
+  the price with an experimental estimate based on each team's last 10 games,
+  home-court advantage, and rest days, then shows fair odds and example expected
+  value.
+- Team-color cards use custom abbreviation badges. They are not official team
+  logo artwork.
 - Team Comparison shows recent records, points scored/allowed, and a simple net
   rating for two selected teams. It uses NBA.com Stats data when available and
   clearly labels its illustrative sample-data fallback.
-- Log a Bet saves a user's matchup, bet details, probability estimate, and notes
-  to Supabase.
+- Log a Bet saves an upcoming matchup, entered sportsbook price, experimental
+  model estimate, and notes to Supabase.
 - Bet History filters records by result and date, allows pending bets to be
   settled, and reports win rate, profit/loss, ROI, and bankroll over time.
 - Dark hardwood-inspired theme, shared navigation, inline logo, and responsible
@@ -35,6 +40,8 @@ with students and analysts interested in sports analytics.
 - Opponent-adjusted win-streak quality.
 - Player-vs-defender matchup analysis.
 - User login and authentication with secure per-user records.
+- A calibrated, tested game probability model with richer player and schedule
+  context.
 
 ## Setup
 
@@ -64,10 +71,17 @@ On Windows, activate with `.venv\Scripts\activate`.
    ```toml
    SUPABASE_URL = "https://your-project-id.supabase.co"
    SUPABASE_KEY = "your-supabase-anon-or-publishable-key"
+   ODDS_API_KEY = "your-the-odds-api-key"
    ```
 
    The actual `secrets.toml` is ignored by Git. Never commit real credentials.
    The username field is only a record filter, not authentication or security.
+5. Create an account with [The Odds API](https://the-odds-api.com/) and add its
+   API key as `ODDS_API_KEY` in the same local secrets file. The app requests
+   US NBA head-to-head moneylines, caches them for five minutes, and displays
+   the provider's remaining request quota when available. API plans and quotas
+   can change; check the provider's current pricing before relying on a plan.
+   Without a valid key, you can still enter odds manually.
 
 ### 3. Run Line Check
 
@@ -76,7 +90,10 @@ streamlit run app.py
 ```
 
 The NBA.com Stats API may be temporarily unavailable; Team Comparison then
-displays clearly labeled sample data. Bet logging and history require valid
+displays clearly labeled sample data, while Edge Finder and bet logging report
+that a live form estimate is unavailable. The Odds API key is optional; without
+it, enter sportsbook odds manually. The early form estimate is experimental and
+should not be treated as betting advice. Bet logging and history require valid
 Supabase credentials and the SQL table setup.
 
 ## Responsible Use

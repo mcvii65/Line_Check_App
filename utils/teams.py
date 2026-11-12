@@ -35,3 +35,38 @@ NBA_TEAMS: tuple[tuple[str, str], ...] = (
 
 TEAM_NAMES = tuple(team[0] for team in NBA_TEAMS)
 TEAM_ABBREVIATIONS = {name: abbreviation for name, abbreviation in NBA_TEAMS}
+TEAM_COLORS = {
+    "ATL": ("#E03A3E", "#C1D32F"),
+    "BOS": ("#007A33", "#BA9653"),
+    "BKN": ("#171717", "#FFFFFF"),
+    "CHA": ("#1D1160", "#00788C"),
+    "CHI": ("#CE1141", "#111111"),
+    "CLE": ("#6F263D", "#FFB81C"),
+    "DAL": ("#00538C", "#B8C4CA"),
+    "DEN": ("#0E2240", "#FEC524"),
+    "DET": ("#C8102E", "#1D42BA"),
+    "GSW": ("#1D428A", "#FFC72C"),
+    "HOU": ("#CE1141", "#C4CED4"),
+    "IND": ("#002D62", "#FDBB30"),
+    "LAC": ("#C8102E", "#1D428A"),
+    "LAL": ("#552583", "#FDB927"),
+    "MEM": ("#5D76A9", "#12173F"),
+    "MIA": ("#98002E", "#F9A01B"),
+    "MIL": ("#00471B", "#EEE1C6"),
+    "MIN": ("#0C2340", "#236192"),
+    "NOP": ("#0C2340", "#C8102E"),
+    "NYK": ("#006BB6", "#F58426"),
+    "OKC": ("#007AC1", "#EF3B24"),
+    "ORL": ("#0077C0", "#C4CED4"),
+    "PHI": ("#006BB6", "#ED174C"),
+    "PHX": ("#1D1160", "#E56020"),
+    "POR": ("#E03A3E", "#111111"),
+    "SAC": ("#5A2D81", "#63727A"),
+    "SAS": ("#52565A", "#C4CED4"),
+    "TOR": ("#CE1141", "#111111"),
+    "UTA": ("#002B5C", "#F9A01B"),
+    "WAS": ("#002B5C", "#E31837"),
+}
+TEAM_NAME_BY_ABBREVIATION = {
+    abbreviation: name for name, abbreviation in NBA_TEAMS
+}
